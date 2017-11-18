@@ -39,7 +39,7 @@ module.exports = {
     });
   },
 
-  getEncryptedKey: function(username, cb){
+  getEncryptedAccount: function(username, cb){
     User.findOne({'username': username}, function(err, user){
       if (err){
         console.log(err);
@@ -64,6 +64,44 @@ module.exports = {
           cb(user.hashedPassword);
         } else {
           cb("");
+        }
+      }
+    });
+  },
+
+  getHistory: function(username, cb){
+    User.findOne({'username': username}, function(err, user){
+      if (err){
+        console.log(err);
+        cb([]);
+      } else {
+        if (user){
+          cb(user.transactionHistory);
+        } else {
+          cb([]);
+        }
+      }
+    });
+  },
+
+  addHistory: function(username, record, cb){
+    User.findOne({'username': username}, function(err, user){
+      if (err){
+        console.log(err);
+        cb(false);
+      } else {
+        if (user){
+          user.transactionHistory.push(record);
+          user.save(function(err, user){
+            if (err) {
+              console.log(err);
+              cb(false);
+            } else {
+              cb(true);
+            }
+          });
+        } else {
+          cb(false);
         }
       }
     });

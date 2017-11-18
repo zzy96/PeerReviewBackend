@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var ac = require('../controllers/authenticationController');
 var mc = require('../controllers/mainController');
 
 /* Login */
@@ -14,7 +15,7 @@ router.post('/signup', mc.signUp);
 router.get('/address/:address', mc.addressToUsername);
 
 /* History */
-router.post('/history/:username', mc.writeHistory);
-router.get('/history/:username', mc.readHistory);
+router.post('/history/:username', ac.checkLogin, mc.writeHistory);
+router.get('/history/:username', ac.checkLogin, mc.readHistory);
 
 module.exports = router;

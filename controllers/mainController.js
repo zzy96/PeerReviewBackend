@@ -7,16 +7,16 @@ module.exports = {
   login: function(req, res, next){
     ac.login(req, function(result){
       if (result){
-        res.json({ status: 'success' });
+        res.json({ status: 'success', action: "login"});
       } else {
-        res.json({ status: 'fail' });
+        res.json({ status: 'fail', action: "login"});
       }
     });
   },
 
   logout: function(req, res, next){
     ac.logout(req, function(){
-      res.json({ status: 'success' });
+      res.json({ status: 'success', action: "logout"});
     });
   },
 
@@ -24,13 +24,18 @@ module.exports = {
     // username == "" as signal for not login
     ac.loginStatus(req, function(username){
       if (username == ""){
-        res.json({ username: "" });
+        res.json({ username: "", action: "login status"});
       } else {
-        res.json({
-          username: username,
-          address: dc.getAddress(username),
-          encryptedAccount: dc.getEncryptedAccount(username),
-        })
+        var response = {
+          username: username
+        }
+        dc.getAddress(username, function(address){
+          response.address = address;
+          dc.getEncryptedAccount(username, function(encryptedAccount){
+            response.encryptedAccount = encryptedAccount;
+            res.json(response);
+          });
+        });
       }
     });
   },
@@ -47,13 +52,13 @@ module.exports = {
     dc.newUser(user, function(err){
       if (err){
         console.log(err);
-        res.json({ status: 'fail' });
+        res.json({ status: 'fail', action: "sign up"});
       } else {
         bc.topup(user.address, function(flag){
           if (flag){
-            res.json({ status: 'success', topup: 'success'});
+            res.json({ status: 'success', topup: 'success', action: "sign up"});
           } else {
-            res.json({ status: 'success', topup: 'fail'});
+            res.json({ status: 'success', topup: 'fail', action: "sign up"});
           }
         });
       }
@@ -62,17 +67,31 @@ module.exports = {
   },
 
   addressToUsername: function(req, res, next){
-    dc.getUsername(address, function(username){
-      res.json({'username': username});
+    console.log(req.params.address);
+    dc.getUsername(req.params.address, function(username){
+      res.json({'username': username, action: "address to username"});
     })
   },
 
   writeHistory: function(req, res, next){
-
+    var transaction = {
+      hash: req.body.hash,
+      amount: req.body.amount,
+      type: req.body.type
+    };
+    dc.addHistory(req.params.username, transaction, function(flag){
+      if (flag){
+        res.json({ status: 'success', action: "add history"});
+      } else {
+        res.json({ status: 'fail', action: "add history"});
+      }
+    });
   },
 
   readHistory: function(req, res, next){
-
+    dc.getHistory(req.params.username, function(history){
+      res.json(history);
+    });
   }
 
 }
