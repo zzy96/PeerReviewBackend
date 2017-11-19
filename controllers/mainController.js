@@ -5,8 +5,8 @@ var dc = require('./databaseController');
 module.exports = {
 
   login: function(req, res, next){
-    ac.login(req, function(result){
-      if (result){
+    ac.login(req, function(flag){
+      if (flag){
         res.json({ status: 'success', action: "login"});
       } else {
         res.json({ status: 'fail', action: "login"});
@@ -54,11 +54,16 @@ module.exports = {
         console.log(err);
         res.json({ status: 'fail', action: "sign up"});
       } else {
-        bc.topup(user.address, function(flag){
-          if (flag){
-            res.json({ status: 'success', topup: 'success', action: "sign up"});
-          } else {
-            res.json({ status: 'success', topup: 'fail', action: "sign up"});
+        ac.login(req, function(result){
+          if (result){
+            console.log("user: " + user.username + " successfully sign up!");
+            bc.topup(user.address, function(flag){
+              if (flag){
+                res.json({ status: 'success', topup: 'success', action: "sign up"});
+              } else {
+                res.json({ status: 'success', topup: 'fail', action: "sign up"});
+              }
+            });
           }
         });
       }
@@ -76,7 +81,7 @@ module.exports = {
   writeHistory: function(req, res, next){
     var transaction = {
       hash: req.body.hash,
-      amount: req.body.amount,
+      balance: req.body.balance,
       type: req.body.type
     };
     dc.addHistory(req.params.username, transaction, function(flag){
