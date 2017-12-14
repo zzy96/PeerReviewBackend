@@ -17,5 +17,9 @@
     "serve-favicon": "~2.4.2",
     "sha3": "^1.2.0",
     "web3": "^1.0.0-beta.26"
+  },
+  "devDependencies": {
+    "solc": "^0.4.19",
+    "truffle": "^4.0.1"
   }
 }
