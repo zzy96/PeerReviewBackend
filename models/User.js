@@ -3,11 +3,14 @@ var Schema = mongoose.Schema;
 
 module.exports = function(){
   var User = new Schema({
+    isActivated: Boolean,
+    email: String,
     username: String,
     hashedPassword: String,
-    address: String,
+    ethAddress: String,
     encryptedAccount: String,
-    transactionHistory: Array
+    totalTx: Number,
+    txHistory: Array
   }, {collection: 'User'});
-  mongoose.model('User',User);
+  mongoose.model('User', User);
 }

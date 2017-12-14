@@ -181,24 +181,31 @@ contract Escrow{
     store.voteReview(_voter, _reviewer, _is_upvote, credibility[_voter]);
   }
 
-  function settle() public {
-    for (uint256 i = 0; i < allActiveReviews.length; i++){
-      // loop through all active reviews and settle timeout ones
-      if (block.timestamp - allActiveReviews[i].blockstamp >= 10){
-        Store store = Store(allActiveReviews[i].store);
-        uint256 amount;
-        bool sign;
-        (sign, amount) = store.settleReview(allActiveReviews[i].reviewer);
-        if (sign){
-          allActiveReviews[i].reviewer.transfer(allActiveReviews[i].deposit + 100000000000000 + amount * 10000000000);
-          credibility[allActiveReviews[i].reviewer] = (credibility[allActiveReviews[i].reviewer] * 90 + 10000)/100;
-        } else {
-          credibility[allActiveReviews[i].reviewer] = (credibility[allActiveReviews[i].reviewer] * 90 + 0)/100;
-        }
-        // delete settled review
-        allActiveReviews[i] = allActiveReviews[allActiveReviews.length - 1];
-        delete allActiveReviews[allActiveReviews.length - 1];
+  // give reward to caller
+  function settle()
+    public
+    returns(uint256) {
+      uint256 counter = 0;
+      for (uint256 i = 0; i < allActiveReviews.length; i++){
+        // loop through all active reviews and settle timeout ones
+        if (block.timestamp - allActiveReviews[i].blockstamp >= 10){
+          // Store store = Store(allActiveReviews[i].store);
+          // uint256 amount;
+          // bool sign;
+          // (sign, amount) = store.settleReview(allActiveReviews[i].reviewer);
+          // if (sign){
+          //   allActiveReviews[i].reviewer.transfer(allActiveReviews[i].deposit + 100000000000000 + amount * 10000000000);
+          //   credibility[allActiveReviews[i].reviewer] = (credibility[allActiveReviews[i].reviewer] * 90 + 10000)/100;
+          // } else {
+          //   credibility[allActiveReviews[i].reviewer] = (credibility[allActiveReviews[i].reviewer] * 90 + 0)/100;
+          // }
+          // delete settled review
+          allActiveReviews[i] = allActiveReviews[allActiveReviews.length - 1];
+          // delete allActiveReviews[allActiveReviews.length - 1 - counter];
+          // counter++;
+          allActiveReviews.length--;
       }
     }
+    return allActiveReviews.length;
   }
 }

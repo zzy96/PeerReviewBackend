@@ -4,13 +4,22 @@ var User = mongoose.model("User");
 
 module.exports = {
 
+  /*
+  newUser: function(data, cb);
+  getUsernameByAddress: function(address, cb);
+  getProfileByUsername: function(username, cb);
+  getHashedPasswordByUsername: function(username, cb);
+  getHistoryById: function(id, pageNum, cb);
+  addHistoryById: function(id, record, cb);
+  */
+
   newUser: function(data, cb){
     var user = new User(data);
     user.save(cb);
   },
 
-  getUsername: function(address, cb){
-    User.findOne({'address': address}, function(err, user){
+  getUsernameByAddress: function(address, cb){
+    User.findOne({'ethAddress': address}, function(err, user){
       if (err){
         console.log(err);
         cb("");
@@ -24,14 +33,15 @@ module.exports = {
     });
   },
 
-  getAddress: function(username, cb){
+  getProfileByUsername: function(username, cb){
     User.findOne({'username': username}, function(err, user){
       if (err){
         console.log(err);
         cb("");
       } else {
         if (user){
-          cb(user.address);
+          delete user.txHistory;
+          cb(user);
         } else {
           cb("");
         }
@@ -39,22 +49,7 @@ module.exports = {
     });
   },
 
-  getEncryptedAccount: function(username, cb){
-    User.findOne({'username': username}, function(err, user){
-      if (err){
-        console.log(err);
-        cb("");
-      } else {
-        if (user){
-          cb(JSON.parse(user.encryptedAccount));
-        } else {
-          cb("");
-        }
-      }
-    });
-  },
-
-  getHashedPassword: function(username, cb){
+  getHashedPasswordByUsername: function(username, cb){
     User.findOne({'username': username}, function(err, user){
       if (err){
         console.log(err);
@@ -69,14 +64,14 @@ module.exports = {
     });
   },
 
-  getHistory: function(username, cb){
-    User.findOne({'username': username}, function(err, user){
+  getHistoryById: function(id, pageNum, cb){
+    User.findOne({'_id': id}, function(err, user){
       if (err){
         console.log(err);
         cb([]);
       } else {
         if (user){
-          cb(user.transactionHistory);
+          cb(user.txHistory);
         } else {
           cb([]);
         }
@@ -84,14 +79,14 @@ module.exports = {
     });
   },
 
-  addHistory: function(username, record, cb){
-    User.findOne({'username': username}, function(err, user){
+  addHistoryById: function(id, record, cb){
+    User.findOne({'_id': id}, function(err, user){
       if (err){
         console.log(err);
         cb(false);
       } else {
         if (user){
-          user.transactionHistory.push(record);
+          user.txHistory.push(record);
           user.save(function(err, user){
             if (err) {
               console.log(err);
