@@ -4,7 +4,7 @@ module.exports = {
 
 	login: function(req, cb){
 		console.log(req.body); // for debugging
-		dc.getHashedPassword(req.body.username, function(result){
+		dc.getHashedPasswordByUsername(req.body.username, function(result){
 			if (result == req.body.hashedPassword && req.body.hashedPassword != ""){
 				req.session.user = req.body.username;
 				cb(true);
@@ -28,11 +28,11 @@ module.exports = {
 		}
 	},
 
-	checkLogin: function(req, res, next){
+	loginCheck: function(req, res, next){
 		if (req.session && req.session.user){
 			next();
 		} else {
-			res.json({ status: 'fail', action: "login check" });
+			res.status(403).send('permission denied!');
 		}
 	}
 
