@@ -68,8 +68,20 @@ module.exports = {
 
   },
 
-  signupValidation: function(req, res, next){
-
+  signUpValidation: function(req, res, next){
+    dc.usernameValidation(req.body.username, function(username_result){
+      dc.emailValidation(req.body.email, function(email_result){
+        if (username_result && email_result){
+          res.json({'username_status': true, 'email_status': true});
+        } else if (!username_result && email_result){
+          res.json({'username_status': false, 'email_status': true});
+        } else if (username_result && !email_result){
+          res.json({'username_status': true, 'email_status': false});
+        } else{
+          res.json({'username_status': false, 'email_status': false});
+        }
+      });
+    });
   },
 
   resetRequest: function(req, res, next){

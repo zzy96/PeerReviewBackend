@@ -11,6 +11,8 @@ module.exports = {
   getHashedPasswordByUsername: function(username, cb);
   getHistoryById: function(id, pageNum, cb);
   addHistoryById: function(id, record, cb);
+  usernameValidation: function(username, cb);
+  emailValidation: function(email, cb);
   */
 
   newUser: function(data, cb){
@@ -97,6 +99,36 @@ module.exports = {
           });
         } else {
           cb(false);
+        }
+      }
+    });
+  },
+
+  usernameValidation: function(username, cb){
+    User.findOne({'username': username}, function(err, user){
+      if (err){
+        console.log(err);
+        cb(false);
+      } else {
+        if (user){
+          cb(false);
+        } else {
+          cb(true);
+        }
+      }
+    });
+  },
+
+  emailValidation: function(email, cb){
+    User.findOne({'email': email}, function(err, user){
+      if (err){
+        console.log(err);
+        cb(false);
+      } else {
+        if (user){
+          cb(false);
+        } else {
+          cb(true);
         }
       }
     });
