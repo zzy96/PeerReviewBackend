@@ -95,7 +95,7 @@ contract Store {
       }
       else{
         allReviews[reviewIndexPlusOneByReviewer[_reviewer] - 1].downvote += 1;
-        allReviews[reviewIndexPlusOneByReviewer[_reviewer] - 1].negative_impact -= (_credibility+100);
+        allReviews[reviewIndexPlusOneByReviewer[_reviewer] - 1].negative_impact += (_credibility+100);
       }
       
     LogVoteAdded(_voter, _reviewer, _is_upvote);
