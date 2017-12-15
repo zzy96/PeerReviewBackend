@@ -11,9 +11,10 @@ router.post('/user/login', userController.login);
 router.get('/user/logout', userController.logout);
 router.post('/user/signup', userController.signUp);
 router.get('/user/signup', userController.signUpValidation);
-// router.post('/user/password-reset', userController.resetRequest);
-// router.post('/user/password-reset/verify', userController.resetVerify);
-// router.post('/user/password-change', userController.changePassword);
+router.get('/user/signup/verify/:username/:key', userController.emailVerification);
+router.post('/user/password-reset', userController.resetRequest);
+router.post('/user/password-reset/verify', userController.resetVerification);
+router.post('/user/password-change', userController.changePassword);
 /* historyController */
 router.get('/history/user/:userId/:pageNum', historyController.readHistory);
 router.post('/history/user/:userId', historyController.writeHistory);

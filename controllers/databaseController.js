@@ -7,12 +7,18 @@ module.exports = {
   /*
   newUser: function(data, cb);
   getUsernameByAddress: function(address, cb);
+  getAddressByUsername: function(username, cb);
   getProfileByUsername: function(username, cb);
   getHashedPasswordByUsername: function(username, cb);
   getHistoryById: function(id, pageNum, cb);
   addHistoryById: function(id, record, cb);
   usernameValidation: function(username, cb);
   emailValidation: function(email, cb);
+  getResetByEmail: function(email, cb);
+  updateResetByEmail: function(email, reset, cb);
+  updatePasswordByEmail: function(email, hashedPassword, cb);
+  getEmailVerificationByUsername: function(username, cb);
+  updateEmailByUsername: function(username, cb);
   */
 
   newUser: function(data, cb){
@@ -35,6 +41,21 @@ module.exports = {
     });
   },
 
+  getAddressByUsername: function(username, cb){
+    User.findOne({'username': username}, function(err, user){
+      if (err){
+        console.log(err);
+        cb("");
+      } else {
+        if (user){
+          cb(user.ethAddress);
+        } else {
+          cb("");
+        }
+      }
+    });
+  },
+
   getProfileByUsername: function(username, cb){
     User.findOne({'username': username}, function(err, user){
       if (err){
@@ -42,7 +63,10 @@ module.exports = {
         cb("");
       } else {
         if (user){
-          delete user.txHistory;
+          user.txHistory = undefined;
+          user.emailVerification = undefined;
+          user.hashedPassword = undefined;
+          user.reset = undefined;
           cb(user);
         } else {
           cb("");
@@ -129,6 +153,120 @@ module.exports = {
           cb(false);
         } else {
           cb(true);
+        }
+      }
+    });
+  },
+
+  getResetByEmail: function(email, cb){
+    User.findOne({'email': email}, function(err, user){
+      if (err){
+        console.log(err);
+        cb({});
+      } else {
+        if (user){
+          cb(user.reset);
+        } else {
+          cb({});
+        }
+      }
+    });
+  },
+
+  updateResetByEmail: function(email, reset, cb){
+    User.findOne({'email': email}, function(err, user){
+      if (err){
+        console.log(err);
+        cb(false);
+      } else {
+        if (user){
+          user.reset = reset;
+          user.save(function(err, user){
+            if (err) {
+              console.log(err);
+              cb(false);
+            } else {
+              cb(true);
+            }
+          });
+        } else {
+          cb(false);
+        }
+      }
+    });
+  },
+
+  updatePasswordByEmail: function(email, hashedPassword, cb){
+    User.findOne({'email': email}, function(err, user){
+      if (err){
+        console.log(err);
+        cb(false);
+      } else {
+        if (user){
+          user.hashedPassword = hashedPassword;
+          user.reset = {
+            status: false,
+          };
+          user.save(function(err, user){
+            if (err) {
+              console.log(err);
+              cb(false);
+            } else {
+              cb(true);
+            }
+          });
+        } else {
+          cb(false);
+        }
+      }
+    });
+  },
+
+  getEmailVerificationByUsername: function(username, cb){
+    User.findOne({'username': username}, function(err, user){
+      if (err){
+        console.log(err);
+        cb("");
+      } else {
+        if (user){
+          cb(user.emailVerification);
+        } else {
+          cb("");
+        }
+      }
+    });
+  },
+
+  updateEmailByUsername: function(username, cb){
+    User.findOne({'username': username}, function(err, user){
+      if (err){
+        console.log(err);
+        cb(false);
+      } else {
+        if (user){
+          User.findOne({'email': user.unverifiedEmail}, function(err, userCheck){
+            if (err){
+              console.log(err);
+              cb(false);
+            } else {
+              if (userCheck){
+                cb(false);
+              } else {
+                user.email = user.unverifiedEmail;
+                user.isActivated = true;
+                user.save(function(err, user){
+                  if (err) {
+                    console.log(err);
+                    cb(false);
+                  } else {
+                    cb(true);
+                  }
+                });
+              }
+            }
+          });
+        } else {
+          cb(false);
         }
       }
     });
