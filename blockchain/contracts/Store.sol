@@ -19,7 +19,7 @@ contract Store {
     address uploader;
     uint256 upvote;
     uint256 downvote;
-    uint256 creation_blockstamp;
+    uint256 last_update;
     uint256 positive_impact;
     uint256 negative_impact;
   }
@@ -59,12 +59,12 @@ contract Store {
 
       if (reviewIndexPlusOneByReviewer[_uploader] != 0){
       	// update review
-      	// NOTE: everytime a review gets updated, its creation_blockstamp will be reset to extend 
+      	// NOTE: everytime a review gets updated, its last_update will be reset to extend 
       	// the active period.
         totalScore = totalScore + _score - allReviews[reviewIndexPlusOneByReviewer[_uploader] - 1].score;
         allReviews[reviewIndexPlusOneByReviewer[_uploader] - 1].comment = _comment;
         allReviews[reviewIndexPlusOneByReviewer[_uploader] - 1].score = _score;
-        allReviews[reviewIndexPlusOneByReviewer[_uploader] - 1].creation_blockstamp = block.timestamp;
+        allReviews[reviewIndexPlusOneByReviewer[_uploader] - 1].last_update = block.timestamp;
       } else {
       	// add new review
         totalReviewAmount = totalReviewAmount + 1;
@@ -74,7 +74,7 @@ contract Store {
         new_review.comment = _comment;
         new_review.score = _score;
         new_review.uploader = _uploader;
-        new_review.creation_blockstamp = block.timestamp;
+        new_review.last_update = block.timestamp;
         allReviews.push(new_review);
         reviewIndexPlusOneByReviewer[_uploader] = totalReviewAmount;
       }
