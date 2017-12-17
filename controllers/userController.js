@@ -43,6 +43,7 @@ module.exports = {
     user.emailVerification = Math.floor(Math.random() * 10000000000);
     user.email = "";
     user.username = req.body.username;
+    var sha3 = new SHA3.SHA3Hash();
     sha3.update(req.body.password);
     user.hashedPassword = sha3.digest('hex');
     var account = bc.createAccount();
