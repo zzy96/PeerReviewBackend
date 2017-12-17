@@ -22,17 +22,6 @@ contract Escrow{
     uint256 last_update;
   }
 
-  // make sure all finished active reviews are settled (i.e. credibility has been updated)
-  // before allowing further review or vote.
-  modifier noMaturedVetting(address _reviewer) { 
-  	for (uint i=0; i< activeVettingIndexListByUser[_reviewer].length; i++){
-  		// every review has 7 days period for public to vote/vet
-  		// within 7 days, they are active. 
-  		require(now < vettings[activeVettingIndexListByUser[_reviewer][i]].last_update + 7 days && activeVettingIndexListByUser[_reviewer][i] > 0);
-  	}
-  	_; 
-  }
-  
   /*
 	* Constructor
   */
@@ -47,9 +36,9 @@ contract Escrow{
   */
 
   function review(address _store, address _reviewer, string _comment, uint256 _score)
-  	noMaturedVetting(_reviewer)
     public
     payable {
+      require(noMaturedVetting(_reviewer));
       // if store doesn't exist, if statement would fail and state will revert.
       Store store = Store(_store);
       
@@ -87,8 +76,8 @@ contract Escrow{
   
 
   function vote(address _store, address _voter, address _reviewer, bool _is_upvote) 
-  	noMaturedVetting(_voter)
   	public {
+      require(noMaturedVetting(_voter));
       // NOTE: this version of contract doesn't reward voter.
 	    Store store = Store(_store);
       store.voteReview(_voter, _reviewer, _is_upvote, credibility[_voter]);
@@ -142,6 +131,22 @@ contract Escrow{
       return activeVettingIndexListByUser[_reviewer].length;
   } 
 
+  // make sure all finished active reviews are settled (i.e. credibility has been updated)
+  // before allowing further review or vote.
+  function noMaturedVetting(address _reviewer) 
+    public 
+    constant
+    returns (bool) { 
+      for (uint i=0; i< activeVettingIndexListByUser[_reviewer].length; i++){
+        // every review has 7 days period for public to vote/vet
+        // within 7 days, they are active. 
+        if (now > vettings[activeVettingIndexListByUser[_reviewer][i]].last_update + 7 days && activeVettingIndexListByUser[_reviewer][i] > 0){
+          return false;
+        }
+      }
+      return true;
+  }
+  
   /*
   * Internal Functions
   */
