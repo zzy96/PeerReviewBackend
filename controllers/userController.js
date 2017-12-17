@@ -3,7 +3,6 @@ var bc = require('./blockchainController');
 var dc = require('./databaseController');
 var uc = require('../controllers/utilityController');
 var SHA3 = require('sha3');
-var sha3 = new SHA3.SHA3Hash();
 
 module.exports = {
 
@@ -44,6 +43,7 @@ module.exports = {
     user.emailVerification = Math.floor(Math.random() * 10000000000);
     user.email = "";
     user.username = req.body.username;
+    var sha3 = new SHA3.SHA3Hash();
     sha3.update(req.body.password);
     user.hashedPassword = sha3.digest('hex');
     var account = bc.createAccount();
@@ -162,6 +162,7 @@ module.exports = {
   changePassword: function(req, res, next){
     dc.getResetByEmail(req.body.email, function(reset){
       if (reset && reset.status && reset.verified && (new Date().getTime() - reset.timestamp) < 300000){
+        var sha3 = new SHA3.SHA3Hash();
         sha3.update(req.body.newPassword);
         dc.updatePasswordByEmail(req.body.email, sha3.digest('hex'), function(flag){
           if (flag){
