@@ -402,5 +402,93 @@ contract('Escrow', accounts =>{
 			}
 		);
 		
-	});	
+		it('add(or update)review function', ()=>{
+			let escrow_inst;
+			let store_address;
+			let first_timestamp;
+
+			return getEscrowWithStorePromise(['canteen1', 'canteen2'])
+			.then(result =>{
+				escrow_inst = result[0];
+				store_address = result[1];
+				return escrow_inst.review(store_address[0], accounts[1], "first comment for canteen1", 90, {from: accounts[2], value:12345678901234567});
+			})
+			.then(() => escrow_inst.vettings(1))
+			.then(vetting => {
+				assert.equal(vetting[0], store_address[0], 'store address should match');
+				assert.equal(vetting[1], accounts[1], 'reviewer should match');
+				assert.equal(vetting[2], 12345678901234567, 'deposit should match');
+				assert.notEqual(vetting[3], 0, 'last_update should not be 0');
+				first_timestamp = vetting[3];
+				return escrow_inst.vettingIndex(accounts[1], store_address[0])
+			})
+			.then(index => {
+				assert.equal(index, 1, 'vettingIndex should be updated');
+				return escrow_inst.activeVettingIndexListByUser(accounts[1],0);
+			})
+			.then(index => assert.equal(index, 1, 'activeVettingIndexListByUser should update'))
+			.then(() => sendPromise('evm_increaseTime', [1000])) // increase random time)
+			.then(() => sendPromise('evm_mine',[]))
+			.then(() => escrow_inst.review(store_address[0], accounts[1], "update comment for canteen1", 80, {from: accounts[2], value:0}))
+			.then(() => escrow_inst.vettings(1))
+			.then(vetting => {
+				assert.equal(vetting[2], 12345678901234567, 'deposit should not change');
+				assert.isBelow(first_timestamp, vetting[3], 'last_update should be updated');
+			});
+		});
+	});
+
+	describe('vote function', () =>{
+		it('only vote on non-empty review', () =>{
+			let escrow_inst;
+			let store_address;
+			let store_inst;
+
+			return getEscrowWithStorePromise(['canteen1'])
+			.then(result =>{
+				escrow_inst = result[0];
+				store_address = result[1][0];
+				return escrow_inst.vote(store_address, accounts[0], accounts[9], true)
+			})
+			.catch(err => {
+				assert.isNotNull(err, 'should not vote a reviewer without review');
+				return escrow_inst.review(store_address, accounts[9], "first comment on canteen1", 80, {from:accounts[9], value:10000000000000000});
+			})
+			.then(() => escrow_inst.vote(store_address, accounts[0], accounts[9], true))
+			.then(() => Store.at(store_address))
+			.then(instance =>{
+				store_inst = instance;
+				return store_inst.voted(accounts[0], accounts[9])
+			})
+			.then(voted => {
+				assert.equal(voted, true, 'should voted')
+			})
+		});
+
+		it('no double vote', () =>{
+			let escrow_inst;
+			let store_address;
+			let store_inst;
+
+			return getEscrowWithStorePromise(['canteen1'])
+			.then(result =>{
+				escrow_inst = result[0];
+				store_address = result[1][0];
+				return escrow_inst.review(store_address, accounts[9], "first comment on canteen1", 80, {from:accounts[9], value:10000000000000000});
+			})
+			.then(() => escrow_inst.vote(store_address, accounts[0], accounts[9], true))
+			.then(() => Store.at(store_address))
+			.then(instance =>{
+				store_inst = instance;
+				return store_inst.voted(accounts[0], accounts[9])
+			})
+			.then(voted => {
+				assert.equal(voted, true, 'should voted')
+			})
+			.then(() => escrow_inst.vote(store_address, accounts[0], accounts[9], false))
+			.catch(err => assert.isNotNull(err, 'should not be able to double vote'))
+		});
+
+
+	});
 });

@@ -36,7 +36,8 @@ contract Store {
     _;
   }
 
-  modifier validVote(address _voter, address _reviewer) { 
+  modifier validVote(address _voter, address _reviewer) {
+    require(reviewIndexPlusOneByReviewer[_reviewer] != 0); 
     require(voted[_voter][_reviewer] == false);
     _; 
   }

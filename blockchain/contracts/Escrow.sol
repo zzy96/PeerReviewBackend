@@ -55,7 +55,7 @@ contract Escrow{
         newVetting.last_update = block.timestamp;
 
         vettings.push(newVetting);
-        vettingIndex[_reviewer][_store] = vettings.length;
+        vettingIndex[_reviewer][_store] = vettings.length-1;
         activeVettingIndexListByUser[_reviewer].push(vettings.length-1);
         
         store.addReview(_comment, _score, _reviewer);
