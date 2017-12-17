@@ -567,4 +567,40 @@ contract('Escrow', accounts =>{
 			.then(index => assert.equal(index, 0, 'activeVettingIndexListByUser should reset'))
 		});
 	});
+
+	describe('claim function', ()=>{
+		it('should claim right amount and claimable set to 0', ()=>{
+			let escrow_inst;
+			let store_address;
+			let store_inst;
+			let before_balance;
+			let after_balance;
+
+			return getEscrowWithStorePromise(['canteen1', 'canteen2'])
+			.then(result =>{
+				escrow_inst = result[0];
+				store_address = result[1];
+				return escrow_inst.review(store_address[0], accounts[9], "first comment on canteen1", 90, {from: accounts[9], value:10000000000000000});
+			})
+			.then(() => escrow_inst.vote(store_address[0], accounts[0], accounts[9], true))
+			.then(() => escrow_inst.vote(store_address[0], accounts[1], accounts[9], true))
+			.then(() => escrow_inst.vote(store_address[0], accounts[2], accounts[9], false))
+			.then(() => sendPromise('evm_increaseTime', [604800+10]))
+			.then(() => sendPromise('evm_mine', []))
+			.then(() => escrow_inst.send(web3.toWei(1, 'ether')))
+			.then(() => escrow_inst.settle(accounts[9]))
+			.then(() => web3.eth.getBalance(accounts[9]))
+			.then(bal => {
+				before_balance = bal;
+				return escrow_inst.claim(accounts[9]);
+			})
+			.then(() => web3.eth.getBalance(accounts[9]))
+			.then(bal =>{
+				after_balance = bal;
+				assert.equal((after_balance - before_balance - 10200000000000000), 0, 'correct amount')
+			})
+			.then(() => escrow_inst.settlements(accounts[9]))
+			.then(amount => assert.equal(amount, 0, 'should be 0 settlement after claim'))
+		})
+	})
 });

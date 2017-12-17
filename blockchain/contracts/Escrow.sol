@@ -32,6 +32,14 @@ contract Escrow{
   }
 
   /*
+  * Fallback Functions
+  */
+  function () public
+    payable {
+      
+  }
+  
+  /*
   * Public Functions
   */
 
