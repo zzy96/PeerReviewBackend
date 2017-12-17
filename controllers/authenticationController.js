@@ -1,11 +1,16 @@
 var dc = require('./databaseController');
+var SHA3 = require('sha3');
+var sha3 = new SHA3.SHA3Hash();
 
 module.exports = {
 
 	login: function(req, cb){
 		console.log(req.body); // for debugging
 		dc.getHashedPasswordByUsername(req.body.username, function(result){
-			if (result == req.body.hashedPassword && req.body.hashedPassword != ""){
+			sha3.update(req.body.password);
+			console.log(result);
+			console.log(sha3.digest('hex'));
+			if (result != "" && result == sha3.digest('hex')){
 				req.session.user = req.body.username;
 				cb(true);
 			} else {

@@ -15,6 +15,7 @@
     "ethjs-rpc": "^0.1.8",
     "express": "~4.15.2",
     "express-session": "^1.15.3",
+    "mailgun-js": "^0.13.1",
     "mongoose": "^4.13.4",
     "morgan": "~1.8.1",
     "serve-favicon": "~2.4.2",
