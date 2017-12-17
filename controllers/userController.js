@@ -62,7 +62,7 @@ module.exports = {
         res.status(500).send(err);
       } else {
         ac.login(req, function(result){
-          uc.sendVerificationEmail(user.unverifiedEmail, "http://188.166.190.168/user/signup/verify/" + user.username + "/" + user.emailVerification);
+          uc.sendVerificationEmail(user.unverifiedEmail, "http://188.166.190.168:3001/user/signup/verify/" + user.username + "/" + user.emailVerification);
           if (result){
             res.status(200).send("account created");
           } else {

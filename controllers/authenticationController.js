@@ -8,6 +8,8 @@ module.exports = {
 		console.log(req.body); // for debugging
 		dc.getHashedPasswordByUsername(req.body.username, function(result){
 			sha3.update(req.body.password);
+			console.log(result);
+			console.log(sha3.digest('hex'));
 			if (result != "" && result == sha3.digest('hex')){
 				req.session.user = req.body.username;
 				cb(true);
