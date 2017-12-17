@@ -11,7 +11,7 @@ contract Escrow{
   // map user with claimable reward
   mapping (address => uint256) public settlements;
   // NOTE:non-empty vettings starts at index 1 !!
-  Vetting[] vettings;
+  Vetting[] public vettings;
   
   address public storeRegistry;
 
