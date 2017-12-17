@@ -310,7 +310,7 @@ contract('Escrow', accounts =>{
 		let store_address = [];
 
 		return new Promise((resolve, reject) =>{
-			StoreRegistry.deployed()
+			StoreRegistry.new()
 			.then(instance =>{
 				registry_inst = instance;
 				return registry_inst.escrowAddress();
@@ -379,27 +379,25 @@ contract('Escrow', accounts =>{
 				 	store_address = result[1];
 				 	return escrow_inst.review(store_address[0], accounts[0], "first comment on canteen1", 80, {from:accounts[0], value:10000000000000000});
 				 })
-				 .then(() => escrow_inst.review(store_address[1], accounts[0], "first comment on canteen2", 80, {from:accounts[0], value:10000000000000000}))
-				 .then(() => escrow_inst.vettings.call(0))
+				 .then(() => escrow_inst.vettings(1))
 				 .then(vetting => {
-				 	console.log("reached here")
-				 	console.log(vetting)
 				 	assert.equal(vetting[0], store_address[0], 'new review should be added');
 				 	return web3.eth.getBlock('latest').timestamp
-				 })	
-				 .catch(err => console.log(err))
+				 })
 				 .then(block => {
 				 	console.log("current block: "+ block);
-				 	return sendPromise('evm_increaseTime',[604800+1])
+				 	return sendPromise('evm_increaseTime',[604800+10])
 				 })
 				 .then(() => sendPromise('evm_mine', []))
 				 .then(() => web3.eth.getBlock('latest').timestamp)
 				 .then(block => console.log("after fast forwarding 7 days: "+block))
-				 .then(() => escrow_inst.review(store_address[0], accounts[0], "second comment", 80, {from:accounts[0], value:10000000000000000}))
+				 .then(() => escrow_inst.review(store_address[1], accounts[0], "second comment", 80, {from:accounts[0], value:10000000000000000}))
 				 .catch(err => assert.isNotNull(err, 'with pending settlements, new review should fail'))
 				 .then(() => escrow_inst.settle(accounts[0]))
+				 .then(() => escrow_inst.vettingIndex(accounts[0], store_address[0]))
+				 .then(index => assert.equal(index, 0, 'active vetting should be settled.'))
 				 .then(() => escrow_inst.review(store_address[1], accounts[0], "third comment", 90, {from:accounts[0], value:10000000000000000}))
-				 .then(() => escrow_inst.vettings(1))
+				 .then(() => escrow_inst.vettings(2))
 				 .then(review => assert.equal(review[0], store_address[1], 'new review should be added'))
 			}
 		);

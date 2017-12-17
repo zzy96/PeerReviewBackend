@@ -107,9 +107,9 @@ contract Escrow{
           credibility[_reviewer] = (credibility[_reviewer]*90)/100;
         }
         // delete this settled review from active list
-        vettings[i] = vettings[vettings.length-1];
-        delete vettings[vettings.length-1];
-        vettings.length --;
+        delete vettingIndex[_reviewer][vettings[index].store];
+        delete activeVettingIndexListByUser[_reviewer][i];
+        delete vettings[index];
   		}
   	}
   }
