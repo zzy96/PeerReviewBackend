@@ -88,7 +88,7 @@ contract Escrow{
   	for (uint i=0; i<activeVettingIndexListByUser[_reviewer].length; i++){
       uint256 index = activeVettingIndexListByUser[_reviewer][i];
 
-  		if (now > vettings[index].last_update + 7 days){
+  		if (now > vettings[index].last_update + 7 days && index != 0){
   			// if the active period (7 days) has passed, then finalized and settled the reward.
         // reward consists of the original deposit from reviewer + base reward 0.001 ether +
         Store store = Store(vettings[index].store);
@@ -123,13 +123,6 @@ contract Escrow{
       settlements[_claimer] = 0;
       _claimer.transfer(claimable);
   }  
-
-  function getLength (address _reviewer)
-    public
-    constant
-    returns(uint) {
-      return activeVettingIndexListByUser[_reviewer].length;
-  } 
 
   // make sure all finished active reviews are settled (i.e. credibility has been updated)
   // before allowing further review or vote.

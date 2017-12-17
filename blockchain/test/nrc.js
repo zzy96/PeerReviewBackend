@@ -488,7 +488,83 @@ contract('Escrow', accounts =>{
 			.then(() => escrow_inst.vote(store_address, accounts[0], accounts[9], false))
 			.catch(err => assert.isNotNull(err, 'should not be able to double vote'))
 		});
+	});
 
+	describe('settle function', ()=>{
+		it('should not settle before vetting matured', ()=>{
+			let escrow_inst;
+			let store_address;
 
+			return getEscrowWithStorePromise(['canteen1'])
+			.then(result =>{
+				escrow_inst = result[0];
+				store_address = result[1][0];
+				return escrow_inst.review(store_address, accounts[9], "first comment on canteen1", 90, {from: accounts[9], value:10000000000000000});
+			})
+			.then(() => escrow_inst.vote(store_address, accounts[0], accounts[9], true))
+			.then(() => escrow_inst.settle(accounts[9]))
+			.then(() => escrow_inst.settlements(accounts[9]))
+			.then(amount => assert(amount, 0, 'should not settle yet'))
+		});
+		
+		it('should settle with correct settlements and credibility', ()=>{
+			let escrow_inst;
+			let store_address;
+
+			return getEscrowWithStorePromise(['canteen1', 'canteen2'])
+			.then(result =>{
+				escrow_inst = result[0];
+				store_address = result[1];
+				return escrow_inst.review(store_address[0], accounts[9], "first comment on canteen1", 90, {from: accounts[9], value:10000000000000000});
+			})
+			.then(() => escrow_inst.vote(store_address[0], accounts[0], accounts[9], true))
+			.then(() => escrow_inst.vote(store_address[0], accounts[1], accounts[9], true))
+			.then(() => escrow_inst.vote(store_address[0], accounts[2], accounts[9], false))
+			.then(() => sendPromise('evm_increaseTime', [604800+10]))
+			.then(() => sendPromise('evm_mine', []))
+			.then(() => escrow_inst.settle(accounts[9]))
+			.then(() => escrow_inst.settlements(accounts[9]))
+			.then(amount => assert.equal(amount, 10200000000000000, 'reward should be 0.01002 ether'))
+			.then(() => escrow_inst.credibility(accounts[9]))
+			.then(credibility => assert.equal(credibility, 100, 'credibility should increase to 100'))
+			.then(() => escrow_inst.review(store_address[1], accounts[9], "nasty comment on canteen1", 20, {from: accounts[9], value:10000000000000000}))
+			.then(() => escrow_inst.vote(store_address[1], accounts[0], accounts[9], false))
+			.then(() => escrow_inst.vote(store_address[1], accounts[1], accounts[9], false))
+			.then(() => escrow_inst.vote(store_address[1], accounts[2], accounts[9], false))
+			.then(() => sendPromise('evm_increaseTime', [604800+10]))
+			.then(() => sendPromise('evm_mine', []))
+			.then(() => escrow_inst.settle(accounts[9]))
+			.then(() => escrow_inst.settlements(accounts[9]))
+			.then(amount => assert.equal(amount, 10200000000000000, 'new reward should be 0, thus no change'))
+			.then(() => escrow_inst.credibility(accounts[9]))
+			.then(credibility => assert.equal(credibility, 90, 'credibility should decrease to 90'))
+		});
+
+		it('should delete/reset index after settlements', ()=>{
+			let escrow_inst;
+			let store_address;
+
+			return getEscrowWithStorePromise(['canteen1'])
+			.then(result =>{
+				escrow_inst = result[0];
+				store_address = result[1][0];
+				return escrow_inst.review(store_address, accounts[9], "first comment on canteen1", 90, {from: accounts[9], value:10000000000000000});
+			})
+			.then(() => escrow_inst.vettingIndex(accounts[9], store_address))
+			.then(index => {
+				assert.equal(index, 1, 'vettingIndex index should be 1');
+				return escrow_inst.activeVettingIndexListByUser(accounts[9], 0)
+			})
+			.then(index => assert.equal(index, 1, 'activeVettingIndexListByUser should be 1'))
+			.then(() => sendPromise('evm_increaseTime', [604800+10]))
+			.then(() => sendPromise('evm_mine', []))
+			.then(() => escrow_inst.settle(accounts[9]))
+			.then(() => escrow_inst.vettingIndex(accounts[9], store_address))
+			.then(index => {
+				assert.equal(index, 0, 'vettingIndex index should reset');
+				return escrow_inst.activeVettingIndexListByUser(accounts[9], 0)
+			})
+			.then(index => assert.equal(index, 0, 'activeVettingIndexListByUser should reset'))
+		});
 	});
 });
