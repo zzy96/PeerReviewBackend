@@ -3,3 +3,4 @@ package-lock.json
 database
 test.js
 blockchain/contracts/build/
+public
