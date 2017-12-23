@@ -3,3 +3,5 @@ package-lock.json
 database
 test.js
 blockchain/contracts/build/
+.DS_Store
+public/.DS_Store
