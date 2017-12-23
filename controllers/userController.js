@@ -4,6 +4,12 @@ var dc = require('./databaseController');
 var uc = require('../controllers/utilityController');
 var SHA3 = require('sha3');
 
+function hashGenerator(input){
+  var sha3 = new SHA3.SHA3Hash();
+  sha3.update(input);
+  return sha3.digest('hex')
+}
+
 module.exports = {
 
   login: function(req, res, next){
@@ -43,9 +49,7 @@ module.exports = {
     user.emailVerification = Math.floor(Math.random() * 10000000000);
     user.email = "";
     user.username = req.body.username;
-    var sha3 = new SHA3.SHA3Hash();
-    sha3.update(req.body.password);
-    user.hashedPassword = sha3.digest('hex');
+    user.hashedPassword = hashGenerator(req.body.password);
     var account = bc.createAccount();
     user.ethAddress = account.address;
     user.encryptedAccount = JSON.stringify(bc.encryptAccount(account.privateKey, user.hashedPassword));
@@ -162,9 +166,7 @@ module.exports = {
   changePassword: function(req, res, next){
     dc.getResetByEmail(req.body.email, function(reset){
       if (reset && reset.status && reset.verified && (new Date().getTime() - reset.timestamp) < 300000){
-        var sha3 = new SHA3.SHA3Hash();
-        sha3.update(req.body.newPassword);
-        dc.updatePasswordByEmail(req.body.email, sha3.digest('hex'), function(flag){
+        dc.updatePasswordByEmail(req.body.email, hashGenerator(req.body.newPassword), function(flag){
           if (flag){
             res.status(200).send("password update success");
           } else {
