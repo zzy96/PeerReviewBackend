@@ -10,12 +10,14 @@ function hashGenerator(input){
 module.exports = {
 
 	login: function(req, cb){
-		dc.getHashedPasswordByUsername(req.body.email, function(result){
+		dc.getHashedPasswordByUsername(req.body.username, function(result){
 			if (result != "" && result == hashGenerator(req.body.password)){
-				dc.getUsernameByEmail(req.body.email, function(username){
-					req.session.user = username;
-					cb(true);
-				})
+				// dc.getUsernameByEmail(req.body.email, function(username){
+				// 	req.session.user = username;
+				// 	cb(true);
+				// })
+				req.session.user = req.body.username;
+				cb(true);
 			} else {
 				cb(false);
 			}

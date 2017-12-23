@@ -6,7 +6,6 @@ module.exports = {
 
   /*
   newUser: function(data, cb);
-  getUsernameByEmail: function(email, cb);
   getUsernameByAddress: function(address, cb);
   getAddressByUsername: function(username, cb);
   getProfileByUsername: function(username, cb);
@@ -27,20 +26,20 @@ module.exports = {
     user.save(cb);
   },
 
-  getUsernameByEmail: function(email, cb){
-    User.findOne({'email': email}, function(err, user){
-      if (err){
-        console.log(err);
-        cb("");
-      } else {
-        if (user){
-          cb(user.username);
-        } else {
-          cb("");
-        }
-      }
-    });
-  },
+  // getUsernameByEmail: function(email, cb){
+  //   User.findOne({'email': email}, function(err, user){
+  //     if (err){
+  //       console.log(err);
+  //       cb("");
+  //     } else {
+  //       if (user){
+  //         cb(user.username);
+  //       } else {
+  //         cb("");
+  //       }
+  //     }
+  //   });
+  // },
 
   getUsernameByAddress: function(address, cb){
     User.findOne({'ethAddress': address}, function(err, user){
