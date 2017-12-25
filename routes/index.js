@@ -10,7 +10,7 @@ router.get('/user', userController.checkLoginStatus);
 router.post('/user/login', userController.login);
 router.get('/user/logout', userController.logout);
 router.post('/user/signup', userController.signUp);
-router.get('/user/signup', userController.signUpValidation);
+router.post('/user/signup/validation', userController.signUpValidation);
 router.get('/user/signup/verify/:username/:key', userController.emailVerification);
 router.post('/user/password-reset', userController.resetRequest);
 router.post('/user/password-reset/verify', userController.resetVerification);
