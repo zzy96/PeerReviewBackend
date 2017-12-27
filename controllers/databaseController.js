@@ -102,7 +102,6 @@ module.exports = {
         if (user){
           user.txHistory = undefined;
           user.emailVerification = undefined;
-          user.hashedPassword = undefined;
           user.reset = undefined;
           cb(user);
         } else {
