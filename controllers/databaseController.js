@@ -1,6 +1,8 @@
 var mongoose = require('mongoose');
 require('../models/User.js')();
 var User = mongoose.model("User");
+require('../models/Image.js')();
+var Image = mongoose.model("Image");
 
 module.exports = {
 
@@ -20,6 +22,26 @@ module.exports = {
   getEmailVerificationByUsername: function(username, cb);
   updateEmailByUsername: function(username, cb);
   */
+
+  newImage: function(data, cb){
+    var image = new Image(data);
+    image.save(cb)
+  },
+
+  getImage: function(keyword, cb){
+    Image.findOne({'keyword': keyword}, function(err, image){
+      if (err){
+        console.log(err);
+        cb("");
+      } else {
+        if (image){
+          cb(image.url);
+        } else {
+          cb("");
+        }
+      }
+    });
+  },
 
   newUser: function(data, cb){
     var user = new User(data);

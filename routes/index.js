@@ -21,6 +21,8 @@ router.post('/history/user/:userId', historyController.writeHistory);
 // router.get('/history/tx/:txId', history.sendTxMultimedia);
 // router.post('history/tx/:txId', history.receiveTxMultimedia);
 /* utilityController */
-router.get('/utility/address-to-username/:address', utilityController.addressToUsername)
+router.get('/utility/address-to-username/:address', utilityController.addressToUsername);
+
+router.get('/image/search/:keyword', utilityController.searchImage);
 
 module.exports = router;

@@ -5,6 +5,8 @@ var emailConfig = {
   api_key:"key-07a57830eb9e1d7229141a8b48555499",
   DOMAIN:"mg.ntuweiqisociety.com"
 }
+const GoogleImages = require('google-images');
+const client = new GoogleImages('013844413201672951539:mks7ril9cvg', 'AIzaSyBYTi2BsX5YoQf02uMyPF9TvrzdUS2K20U');
 
 module.exports = {
 
@@ -35,6 +37,22 @@ module.exports = {
     mailgun.messages().send(data, function (error, body) {
       console.log(body);
     });
+  },
+
+  searchImage: function(req, res, next){
+    dc.getImage(req.params.keyword, function(url){
+      if (url){
+        res.json({'url': url});
+      } else {
+        client.search(req.params.keyword).then(images => {
+          console.log(images[0]);
+          dc.newImage({'keyword':req.params.keyword, 'url':images[0].url}, function(err){
+            console.log(err);
+          });
+          res.json({'url': images[0].url})
+        })
+      }
+    })
   }
 
 }
