@@ -143,7 +143,7 @@ module.exports = {
 
   resetVerification: function(req, res, next){
     dc.getResetByEmail(req.body.email, function(reset){
-      console.log((new Date().getTime() - reset.timestamp) < 30000);
+      console.log((new Date().getTime() - reset.timestamp) < 300000);
       if (reset && reset.status == true && req.body.verificationCode == reset.verificationCode && (new Date().getTime() - reset.timestamp) < 300000){
         reset = {
           status: true,
