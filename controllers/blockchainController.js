@@ -9,7 +9,7 @@ module.exports = {
   topup: function(address, cb){
     // stop topup if balance is lower than 0.01 ether
     web3.eth.getBalance(config.ETH_ACCOUNT.address).then(balance => {
-      if (balance >= 1e16){
+      if (balance >= 1e17){
         web3.eth.sendTransaction({
           from: config.ETH_ACCOUNT.address,
           to: address,
