@@ -11,9 +11,12 @@ module.exports = {
           if (profile._id == req.params.userId){
             var transaction = {
               txHash: req.body.txHash,
+              storeName: req.body.storeName,
+              valueIsPositive: req.body.valueIsPositive,
               value: req.body.value,
-              reviewIndex: req.body.reviewIndex,
-              action: req.body.action
+              originalReviewer: req.body.originalReviewer,
+              action: req.body.action,
+              timestamp: new Date().getTime()
             };
             dc.addHistoryById(req.params.userId, transaction, function(flag){
               if (flag){
