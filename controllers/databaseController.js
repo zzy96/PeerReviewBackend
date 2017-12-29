@@ -3,6 +3,7 @@ require('../models/User.js')();
 var User = mongoose.model("User");
 require('../models/Image.js')();
 var Image = mongoose.model("Image");
+var bc = require('./blockchainController');
 
 module.exports = {
 
@@ -239,6 +240,7 @@ module.exports = {
         cb(false);
       } else {
         if (user){
+          user.encryptedAccount = bc.encryptAccount(bc.decryptAccount(user.encryptedAccount, user.hashedPassword), hashedPassword);
           user.hashedPassword = hashedPassword;
           user.reset = {
             status: false,

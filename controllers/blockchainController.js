@@ -35,5 +35,9 @@ module.exports = {
   
   encryptAccount: function(privateKey, password){
     return web3.eth.accounts.encrypt(privateKey, password);
+  },
+
+  decryptAccount: function(encrypted, password){
+    return web3.eth.accounts.decrypt(encrypted, password).privateKey;
   }
 }
