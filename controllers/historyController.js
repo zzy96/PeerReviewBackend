@@ -43,9 +43,9 @@ module.exports = {
               var start = req.params.pageNum - 1;
               if (history.length > start * 5){
                 if (history.length < start * 5 + 5){
-                  res.json({currentPage: req.params.pageNum, txHistory: history.slice(start * 5, history.length)});
+                  res.json({total: history.length, currentPage: req.params.pageNum, txHistory: history.slice(start * 5, history.length)});
                 } else {
-                  res.json({currentPage: req.params.pageNum, txHistory: history.slice(start * 5, start * 5 + 5)});
+                  res.json({total: history.length, currentPage: req.params.pageNum, txHistory: history.slice(start * 5, start * 5 + 5)});
                 }
               } else {
                 res.status(400).send("no transaction record");
