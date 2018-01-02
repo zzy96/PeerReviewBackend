@@ -149,7 +149,7 @@ module.exports = {
         cb(false);
       } else {
         if (user){
-          user.txHistory.push(record);
+          user.txHistory.unshift(record);
           user.save(function(err, user){
             if (err) {
               console.log(err);
