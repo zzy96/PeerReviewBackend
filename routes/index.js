@@ -25,4 +25,8 @@ router.get('/utility/address-to-username/:address', utilityController.addressToU
 
 router.get('/image/search/:keyword', utilityController.searchImage);
 
+router.get('/test/receipt', function(req, res, next){
+  res.render('receipt', { info: "Your email is verified. 0.08 Ether is sent to your account." });
+})
+
 module.exports = router;

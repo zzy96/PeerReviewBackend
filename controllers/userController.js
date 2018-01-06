@@ -102,9 +102,9 @@ module.exports = {
             dc.getAddressByUsername(req.params.username, function(address){
               bc.topup(address, function(flag){
                 if (flag){
-                  res.status(200).send("email verified. Top up success");
+                  res.render('receipt', { info: "Your email is verified. 0.08 Ether is sent to your account." });
                 } else {
-                  res.status(200).send("email verified. Top up fail");
+                  res.render('receipt', { info: "Your email is verified but top-up is not successful. Please contact us at +65 66666666." });
                 }
               });
             });
