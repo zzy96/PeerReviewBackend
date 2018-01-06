@@ -12,7 +12,8 @@ module.exports = {
             var transaction = {
               txHash: req.body.txHash,
               storeName: req.body.storeName,
-              balance: req.body.balance,
+              value: req.body.value,
+              isPositive: req.body.isPositive,
               originalReviewer: req.body.originalReviewer,
               action: req.body.action,
               timestamp: new Date().getTime()
