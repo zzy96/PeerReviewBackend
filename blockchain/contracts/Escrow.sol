@@ -20,6 +20,8 @@ contract Escrow{
     address reviewer;
     uint256 deposit;
     uint256 last_update;
+    address[] upvoters;
+    address[] downvoters;
   }
 
   /*
@@ -89,6 +91,14 @@ contract Escrow{
       // NOTE: this version of contract doesn't reward voter.
 	    Store store = Store(_store);
       store.voteReview(_voter, _reviewer, _is_upvote, credibility[_voter]);
+      // if the review being voted is still in vetting period, include for settlement
+      if (vettingIndex[_reviewer][_store] != 0){
+        if (_is_upvote){
+          vettings[vettingIndex[_reviewer][_store]].upvoters.push(_voter);
+        } else {
+          vettings[vettingIndex[_reviewer][_store]].downvoters.push(_voter);
+        }
+      }
   }
 
   function settle(address _reviewer) public{
@@ -107,12 +117,31 @@ contract Escrow{
           // settle for reviewer
           settlements[_reviewer] += calculateReward(index, positive_impact - negative_impact);
           credibility[_reviewer] = (credibility[_reviewer]*90 + 10000)/100;
-
+          // settle for voters
+          for (uint j=0; j<vettings[index].upvoters.length; j++){
+            // fixed reward of 0.0001 ether, 2% increase in credibility
+            settlements[vettings[index].upvoters[j]] += 100000000000000;
+            credibility[vettings[index].upvoters[j]] = (credibility[vettings[index].upvoters[j]]*98 + 2000)/100;
+          }
+          for (uint k=0; k<vettings[index].downvoters.length; k++){
+            // loss of 5% credibility in case of unpopular vote
+            credibility[vettings[index].downvoters[k]] = credibility[vettings[index].downvoters[k]]*95/100;
+          }
         } else {
           // settle for reviewer
           // settlements doesn't change (i.e. no reward, lose initial deposit)
           // credibility of reviewer drop to 0.9 of its original value.
           credibility[_reviewer] = (credibility[_reviewer]*90)/100;
+          // settle for voters
+          for (uint l=0; l<vettings[index].downvoters.length; l++){
+            // fixed reward of 0.0001 ether, 2% increase in credibility
+            settlements[vettings[index].downvoters[l]] += 100000000000000;
+            credibility[vettings[index].downvoters[l]] = (credibility[vettings[index].downvoters[l]]*98 + 2000)/100;
+          }
+          for (uint m=0; m<vettings[index].upvoters.length; m++){
+            // loss of 5% credibility in case of unpopular vote
+            credibility[vettings[index].upvoters[m]] = credibility[vettings[index].upvoters[m]]*95/100;
+          }
         }
         // delete this settled review from active list
         delete vettingIndex[_reviewer][vettings[index].store];
@@ -155,10 +184,10 @@ contract Escrow{
   function calculateReward (uint256 _index, uint256 _net_vote) 
     internal
     returns(uint256) {
-      // if _is_positive is true, reward = initial deposit + base reward (0.0001 ether) + _net_vote*(1/1000000) ether.
+      // if _is_positive is true, reward = initial deposit + base reward (0.002 ether) + _net_vote*(1/1000000) ether.
       // otherwise, no reward, which for reviewer would a loss (initial deposit)
       // NOTE: _net_vote/1000000 is likely to be zero. therefore, we use equivalent _net_vote*100 wei.
       
-      return vettings[_index].deposit + 100000000000000 + _net_vote*1000000000000;
+      return vettings[_index].deposit + 2000000000000000 + _net_vote*1000000000000;
   }
 }
