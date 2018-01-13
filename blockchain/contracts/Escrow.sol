@@ -176,6 +176,13 @@ contract Escrow{
       }
       return true;
   }
+
+  function activeVettingIndexListLength(address _reviewer) 
+    public 
+    constant
+    returns (uint256) { 
+      return activeVettingIndexListByUser[_reviewer].length;
+  }
   
   /*
   * Internal Functions
