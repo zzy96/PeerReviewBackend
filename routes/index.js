@@ -21,6 +21,12 @@ router.post('/history/user/:userId', historyController.writeHistory);
 // router.get('/history/tx/:txId', history.sendTxMultimedia);
 // router.post('history/tx/:txId', history.receiveTxMultimedia);
 /* utilityController */
-router.get('/utility/address-to-username/:address', utilityController.addressToUsername)
+router.get('/utility/address-to-username/:address', utilityController.addressToUsername);
+
+router.get('/image/search/:keyword', utilityController.searchImage);
+
+router.get('/test/receipt', function(req, res, next){
+  res.render('receipt', { info: "Your email is verified. 0.08 Ether is sent to your account." });
+})
 
 module.exports = router;

@@ -11,9 +11,12 @@ module.exports = {
           if (profile._id == req.params.userId){
             var transaction = {
               txHash: req.body.txHash,
+              storeName: req.body.storeName,
               value: req.body.value,
-              reviewIndex: req.body.reviewIndex,
-              action: req.body.action
+              isPositive: req.body.isPositive,
+              originalReviewer: req.body.originalReviewer,
+              action: req.body.action,
+              timestamp: new Date().getTime()
             };
             dc.addHistoryById(req.params.userId, transaction, function(flag){
               if (flag){
@@ -41,9 +44,9 @@ module.exports = {
               var start = req.params.pageNum - 1;
               if (history.length > start * 5){
                 if (history.length < start * 5 + 5){
-                  res.json({currentPage: req.params.pageNum, txHistory: history.slice(start * 5, history.length)});
+                  res.json({total: history.length, currentPage: req.params.pageNum, txHistory: history.slice(start * 5, history.length)});
                 } else {
-                  res.json({currentPage: req.params.pageNum, txHistory: history.slice(start * 5, start * 5 + 5)});
+                  res.json({total: history.length, currentPage: req.params.pageNum, txHistory: history.slice(start * 5, start * 5 + 5)});
                 }
               } else {
                 res.status(400).send("no transaction record");

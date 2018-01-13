@@ -102,9 +102,9 @@ module.exports = {
             dc.getAddressByUsername(req.params.username, function(address){
               bc.topup(address, function(flag){
                 if (flag){
-                  res.status(200).send("email verified. Top up success");
+                  res.render('receipt', { info: "Your email is verified. 0.08 Ether is sent to your account." });
                 } else {
-                  res.status(200).send("email verified. Top up fail");
+                  res.render('receipt', { info: "Your email is verified but top-up is not successful. Please contact us at +65 66666666." });
                 }
               });
             });
@@ -143,7 +143,7 @@ module.exports = {
 
   resetVerification: function(req, res, next){
     dc.getResetByEmail(req.body.email, function(reset){
-      console.log((new Date().getTime() - reset.timestamp) < 30000);
+      console.log((new Date().getTime() - reset.timestamp) < 300000);
       if (reset && reset.status == true && req.body.verificationCode == reset.verificationCode && (new Date().getTime() - reset.timestamp) < 300000){
         reset = {
           status: true,

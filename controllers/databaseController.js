@@ -1,6 +1,9 @@
 var mongoose = require('mongoose');
 require('../models/User.js')();
 var User = mongoose.model("User");
+require('../models/Image.js')();
+var Image = mongoose.model("Image");
+var bc = require('./blockchainController');
 
 module.exports = {
 
@@ -20,6 +23,26 @@ module.exports = {
   getEmailVerificationByUsername: function(username, cb);
   updateEmailByUsername: function(username, cb);
   */
+
+  newImage: function(data, cb){
+    var image = new Image(data);
+    image.save(cb)
+  },
+
+  getImage: function(keyword, cb){
+    Image.findOne({'keyword': keyword}, function(err, image){
+      if (err){
+        console.log(err);
+        cb("");
+      } else {
+        if (image){
+          cb(image.url);
+        } else {
+          cb("");
+        }
+      }
+    });
+  },
 
   newUser: function(data, cb){
     var user = new User(data);
@@ -80,7 +103,6 @@ module.exports = {
         if (user){
           user.txHistory = undefined;
           user.emailVerification = undefined;
-          user.hashedPassword = undefined;
           user.reset = undefined;
           cb(user);
         } else {
@@ -127,7 +149,7 @@ module.exports = {
         cb(false);
       } else {
         if (user){
-          user.txHistory.push(record);
+          user.txHistory.unshift(record);
           user.save(function(err, user){
             if (err) {
               console.log(err);
@@ -218,6 +240,7 @@ module.exports = {
         cb(false);
       } else {
         if (user){
+          user.encryptedAccount = JSON.stringify(bc.encryptAccount(bc.decryptAccount(user.encryptedAccount, user.hashedPassword), hashedPassword));
           user.hashedPassword = hashedPassword;
           user.reset = {
             status: false,

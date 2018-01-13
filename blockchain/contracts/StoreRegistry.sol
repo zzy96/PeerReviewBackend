@@ -35,14 +35,4 @@ contract StoreRegistry{
     returns (address){
       return registry[sha256(_placeID)]; 
   }
-
-  function storeExist(string _placeID)
-    public constant
-    returns (bool){
-      if (registry[sha256(_placeID)] == 0x0){
-        return false;
-      } else {
-        return true;
-      }
-  }
 }
