@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var cors = require('cors');
+var fileUpload = require('express-fileupload');
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/dreview', {
   useMongoClient: true
@@ -35,6 +36,7 @@ app.use(session({
   saveUninitialized: true
 }));
 app.use(cors({ credentials: true, origin: true }));
+app.use(fileUpload());
 
 app.use('/', index);
 

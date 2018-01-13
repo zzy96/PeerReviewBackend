@@ -29,4 +29,16 @@ router.get('/test/receipt', function(req, res, next){
   res.render('receipt', { info: "Your email is verified. 0.08 Ether is sent to your account." });
 })
 
+router.post('/upload', function(req, res, next) {
+  var file = req.files.logo;
+  var filename = new Date().getTime() + file.name;
+  file.mv('/root/PeerReviewBackend2.0/public/uploads/' + filename, function(err) {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.json({ url: 'http://188.166.190.168:3001/uploads/' + filename});
+    }
+  });
+});
+
 module.exports = router;
