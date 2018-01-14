@@ -1,6 +1,17 @@
 var ac = require('./authenticationController');
 var bc = require('./blockchainController');
 var dc = require('./databaseController');
+var SHA3 = require('sha3');
+var crypto = require('crypto');
+var fs = require('fs');
+var path = require('path');
+
+function hashGenerator(input){
+  var sha3 = new SHA3.SHA3Hash();
+  sha3.update(input);
+  return sha3.digest('hex')
+}
+
 var emailConfig = {
   api_key:"key-07a57830eb9e1d7229141a8b48555499",
   DOMAIN:"mg.ntuweiqisociety.com"
@@ -53,6 +64,36 @@ module.exports = {
         })
       }
     })
+  },
+
+  fileUpload: function(req, res, next) {
+    console.log("hello");
+    var file = req.files.logo;
+    var filename = new Date().getTime() + file.name;
+    console.log(path.resolve('./public/uploads/' + filename));
+    file.mv(path.resolve('./public/uploads/' + filename), function(err) {
+      if (err) {
+        res.status(500).send(err);
+      } else {
+        var algorithm = 'sha256';
+        var shasum = crypto.createHash(algorithm);
+        var s = fs.ReadStream(path.resolve('./public/uploads/' + filename));
+        s.on('data', function(data) {
+          shasum.update(data);
+        })
+        s.on('end', function() {
+          var hash = shasum.digest('hex');
+          console.log(hash);
+          fs.rename(path.resolve('./public/uploads/' + filename), path.resolve('./public/uploads/' + hash), function(err){
+            if (err){
+              res.status(500).send(err);
+            } else {
+              res.json({ 'hash': hash });
+            }
+          });
+        });
+      }
+    });
   }
 
 }
