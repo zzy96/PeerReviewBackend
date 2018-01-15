@@ -39,25 +39,23 @@ module.exports = {
   writeOthersHistory: function(req, res, next){
     ac.loginStatus(req, function(username){
       if (username){
-        dc.getUsernameByAddress(req.params.address, function(username){
-          dc.getProfileByUsername(username, function(profile){
-            var transaction = {
-              txHash: req.body.txHash,
-              storeName: req.body.storeName,
-              value: req.body.value,
-              isPositive: req.body.isPositive,
-              originalReviewer: req.body.originalReviewer,
-              action: req.body.action,
-              status: req.body.status,
-              timestamp: new Date().getTime()
-            };
-            dc.addHistoryById(profile._id, transaction, function(flag){
-              if (flag){
-                res.status(200).send("new transaction saved");
-              } else {
-                res.status(400).send("operation failed");
-              }
-            });
+        dc.getProfileByUsername(username, function(profile){
+          var transaction = {
+            txHash: req.body.txHash,
+            storeName: req.body.storeName,
+            value: req.body.value,
+            isPositive: req.body.isPositive,
+            originalReviewer: req.body.originalReviewer,
+            action: req.body.action,
+            status: req.body.status,
+            timestamp: new Date().getTime()
+          };
+          dc.addHistoryById(profile._id, transaction, function(flag){
+            if (flag){
+              res.status(200).send("new transaction saved");
+            } else {
+              res.status(400).send("operation failed");
+            }
           });
         });
       } else {
