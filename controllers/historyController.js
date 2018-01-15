@@ -16,6 +16,7 @@ module.exports = {
               isPositive: req.body.isPositive,
               originalReviewer: req.body.originalReviewer,
               action: req.body.action,
+              status: req.body.status,
               timestamp: new Date().getTime()
             };
             dc.addHistoryById(req.params.userId, transaction, function(flag){
@@ -47,6 +48,7 @@ module.exports = {
               isPositive: req.body.isPositive,
               originalReviewer: req.body.originalReviewer,
               action: req.body.action,
+              status: req.body.status,
               timestamp: new Date().getTime()
             };
             dc.addHistoryById(profile._id, transaction, function(flag){
