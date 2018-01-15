@@ -18,6 +18,7 @@ router.post('/user/password-change', userController.changePassword);
 /* historyController */
 router.get('/history/user/:userId/:pageNum', historyController.readHistory);
 router.post('/history/user/:userId', historyController.writeHistory);
+router.post('/history/address/:address', historyController.writeOthersHistory);
 // router.get('/history/tx/:txId', history.sendTxMultimedia);
 // router.post('history/tx/:txId', history.receiveTxMultimedia);
 /* utilityController */
