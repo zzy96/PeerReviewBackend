@@ -197,6 +197,20 @@ contract Escrow{
     returns(uint256) {
       return vettings[_index].downvoters.length;
   }
+
+  function upvoterByVetting (uint256 _vindex, uint256 _index) 
+    public
+    constant
+    returns(address) {
+      return vettings[_vindex].upvoters[_index];
+  }
+  
+  function downvoterByVetting (uint256 _vindex, uint256 _index) 
+    public
+    constant
+    returns(address) {
+      return vettings[_vindex].downvoters[_index];
+  }
   
   /*
   * Internal Functions
